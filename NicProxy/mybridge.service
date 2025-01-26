@@ -1,0 +1,18 @@
+
+[Unit]
+Description=My VPN router
+After=network.target
+
+[Service]
+# Uncomment the next line if you have repos with lots of files and get a HTTP 500 error because of that
+# LimitNOFILE=524288:524288
+RestartSec=5s
+Type=simple
+User=root
+Group=root
+
+ExecStart=/usr/local/bin/Bridge --server --client --bridge=lxcbr0 --tun tap --port 3000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
