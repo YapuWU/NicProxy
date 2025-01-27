@@ -68,6 +68,7 @@ void CRelay::RelayToSocket()
             len = m_socket->read(buffer,(int)iDataLen);
             if (len != (int)iDataLen)
             {
+				std::cout << "Failed to read data from socket len=" <<len <<"  expecting " << iDataLen << std::endl;
                 break;
             }
             m_nic->write(buffer, len);
@@ -97,8 +98,9 @@ void CRelay::RelayToNic()
         while (m_bRunning)
         {
             int len = m_nic->read(buffer, sizeof(buffer));
-            if (len <= 0)
+            if (len < 0)
             {
+				std::cout << "Failed to read data from nic len="<<len << std::endl;
                 break;
             }
             uint32_t iDataLen = len;

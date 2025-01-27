@@ -67,6 +67,11 @@ int CVirtualNic::createTunDevice(const std::string &devName)
 
 int CVirtualNic::read(char *buffer, int len)
 {
+	int ret = ::read(tun_fd, buffer, len);
+	if (ret < 0)
+	{
+		std::cout << "::read return <0: " << strerror(errno) << std::endl;
+	}
     return ::read(tun_fd, buffer, len);
 }
 
