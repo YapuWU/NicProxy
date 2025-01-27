@@ -26,3 +26,5 @@ add_executable(Bridge
 # Link Boost libraries
 target_link_libraries(Bridge ${Boost_LIBRARIES} pthread Boost::program_options Boost::json Boost::system)
 target_precompile_headers(Bridge PRIVATE stdafx.h)
+target_compile_options(Bridge PRIVATE -Wunused-result)
+install(TARGETS Bridge RUNTIME DESTINATION bin)

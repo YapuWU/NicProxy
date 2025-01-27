@@ -29,7 +29,15 @@ bool CClientSide::Start()
 
     std::cout<<"Found USB Nic " << strNicName << std::endl;
     //RequestDHCP(strNicName,strGatewayIP);
-    GetGatewayIPOfNic(strNicName,strGatewayIP);
+    if (!GetGatewayIPOfNic(strNicName, strGatewayIP))
+    {
+		return false;
+    }
+	if (strGatewayIP.empty())
+	{
+		std::cout << "Cannot find gateway IP" << std::endl;
+        return false;
+	}
     std::cout<<"Gateway IP " << strGatewayIP << std::endl;
     SOCKET socket = std::make_shared<boost::asio::ip::tcp::socket>(m_io_context);
     boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address::from_string(strGatewayIP), m_iPort);
