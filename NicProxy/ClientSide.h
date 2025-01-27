@@ -4,7 +4,7 @@ using namespace boost;
 class CClientSide
 {
     public:
-        CClientSide(const std::string& strBridgeName, const std::string& tunNicName,int iPort);
+        CClientSide(const std::string& strBridgeName, const std::string& tunNicName,int iPort,bool bUseNic,const std::string& strServerIP);
         ~CClientSide();
         bool isRunning();
         bool Start();
@@ -21,6 +21,8 @@ class CClientSide
     std::string m_strBridgeName;
     std::string m_strTunName;
     int m_iPort;
+	bool m_bUseNic;
+	std::string m_strServerIP;
     std::atomic_bool m_bRunning;
 
     boost::asio::io_context m_io_context;

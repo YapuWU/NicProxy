@@ -6,13 +6,16 @@ int main(int argc, char *argv[])
     int iPort = 3000;
     std::string strBridgeName = "";
     std::string strTunName = "tun";
-
+	std::string strServerIP = "";
+	bool bUseNIC = true;
     po::options_description desc("Allowed options");
 
     desc.add_options()
         ("help", "produce help message")
         ("server", "run as server")
         ("client", "run as client")
+		("nonic", "do not use nic")
+		("serverip", po::value<std::string>(&strServerIP)->default_value(""), "set server ip")
         ("bridge", po::value<std::string>(&strBridgeName)->default_value(""), "set bridge name")
         ("tun", po::value<std::string>(&strTunName)->default_value("tap"), "set tun name")
         ("port", po::value<int>(&iPort)->default_value(3000), "set port number")
@@ -25,6 +28,12 @@ int main(int argc, char *argv[])
     {
         std::cout<<desc<<std::endl;
     }
+
+    if (vm.count("nonic"))
+    {
+		bUseNIC = false;
+    }
+
     if (vm.count("server"))
     {
         CServerSide server(strBridgeName, strTunName, iPort);
@@ -37,16 +46,19 @@ int main(int argc, char *argv[])
     }
     else if (vm.count("client"))
     {
-        CClientSide client(strBridgeName, strTunName, iPort);
+        CClientSide client(strBridgeName, strTunName, iPort,bUseNIC,strServerIP);
         while(true)
         {
             if(client.isRunning())
             {
                 std::this_thread::sleep_for(std::chrono::seconds(10));
-                std::string strNic;
-                if(client.GetUSBNicName(strNic))
+                if (bUseNIC)
                 {
-                    continue;
+                    std::string strNic;
+                    if (client.GetUSBNicName(strNic))
+                    {
+                        continue;
+                    }
                 }
 
 

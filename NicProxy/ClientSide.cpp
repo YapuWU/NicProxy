@@ -2,12 +2,14 @@
 
 #include "ClientSide.h"
 
-CClientSide::CClientSide(const std::string& bridgeName,const std::string& tunNicName ,int iPort)
+CClientSide::CClientSide(const std::string& bridgeName,const std::string& tunNicName ,int iPort, bool bUseNic, const std::string& strServerIP)
 {
     m_bRunning = false;
     m_strTunName = tunNicName;
     m_strBridgeName = bridgeName;
     m_iPort = iPort;
+	m_bUseNic = bUseNic;
+	m_strServerIP = strServerIP;
 }
 
 CClientSide::~CClientSide()
@@ -18,27 +20,36 @@ CClientSide::~CClientSide()
 bool CClientSide::Start()
 {
     std::string strNicName;
-    std::string strGatewayIP;
+    std::string strGatewayIP = m_strServerIP;
     m_Relay.StopRelay();
     //Don't start until we get the nic name
-    while(!GetUSBNicName(strNicName))
+    if (m_bUseNic)
     {
-        std::cout<<"Waiting for USB NIC"<<std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        while (!GetUSBNicName(strNicName))
+        {
+            std::cout << "Waiting for USB NIC" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
+        std::cout << "Found USB Nic " << strNicName << std::endl;
     }
 
-    std::cout<<"Found USB Nic " << strNicName << std::endl;
-    //RequestDHCP(strNicName,strGatewayIP);
-    if (!GetGatewayIPOfNic(strNicName, strGatewayIP))
-    {
-		return false;
-    }
+
 	if (strGatewayIP.empty())
 	{
-		std::cout << "Cannot find gateway IP" << std::endl;
-        return false;
+
+		//RequestDHCP(strNicName,strGatewayIP);
+		if (!GetGatewayIPOfNic(strNicName, strGatewayIP))
+		{
+			return false;
+		}
+		if (strGatewayIP.empty())
+		{
+			std::cout << "Cannot find gateway IP" << std::endl;
+			return false;
+		}
+
+		std::cout << "Gateway IP " << strGatewayIP << std::endl;
 	}
-    std::cout<<"Gateway IP " << strGatewayIP << std::endl;
     SOCKET socket = std::make_shared<boost::asio::ip::tcp::socket>(m_io_context);
     boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address::from_string(strGatewayIP), m_iPort);
     boost::system::error_code ec;

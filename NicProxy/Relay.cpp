@@ -57,16 +57,16 @@ bool CRelay::StartRelay(MYSOCKET socket, MYNIC nic)
 void CRelay::RelayToSocket()
 {
     char buffer[2048];
-    int iDataLen = 0;
+    uint32_t iDataLen = 0;
     try
     {
         while (m_bRunning)
         {
-            int len = m_socket->read((char*)&iDataLen, sizeof(int));
+            int len = m_socket->read((char*)&iDataLen, sizeof(uint32_t));
 
-            
-            len = m_socket->read(buffer, iDataLen);
-            if (len != iDataLen)
+			iDataLen = ntohl(iDataLen);
+            len = m_socket->read(buffer,(int)iDataLen);
+            if (len != (int)iDataLen)
             {
                 break;
             }
@@ -101,7 +101,9 @@ void CRelay::RelayToNic()
             {
                 break;
             }
-            m_socket->write((char*)&len, sizeof(int));
+            uint32_t iDataLen = len;
+			iDataLen = htonl(iDataLen);
+            m_socket->write((char*)&iDataLen, sizeof(uint32_t));
             m_socket->write(buffer, len);
         }
     }

@@ -65,12 +65,12 @@ int CVirtualNic::createTunDevice(const std::string &devName)
     return fd;
 }
 
-int CVirtualNic::read(char *buffer, int len)
+uint32_t CVirtualNic::read(char *buffer, int len)
 {
     return ::read(tun_fd, buffer, len);
 }
 
-int CVirtualNic::write(const char *buffer, int len)
+uint32_t CVirtualNic::write(const char *buffer, int len)
 {
     return ::write(tun_fd, buffer, len);
 }
