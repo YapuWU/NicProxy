@@ -72,7 +72,7 @@ int CVirtualNic::read(char *buffer, int len)
 	{
 		std::cout << "::read return <0: " << strerror(errno) << std::endl;
 	}
-    return ::read(tun_fd, buffer, len);
+    return ret;
 }
 
 int CVirtualNic::write(const char *buffer, int len)
